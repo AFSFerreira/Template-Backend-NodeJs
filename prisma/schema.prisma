@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
+  output   = "../src/@types/generated/prisma"
 }
 
 datasource db {
@@ -13,39 +8,38 @@ datasource db {
 }
 
 model AuthenticationAudit {
-  id         String               @id @default(uuid(7))
-  ipAddress  String?              @map("ip_address")
-  remotePort String?              @map("remote_port")
-  userAgent  String?              @map("user_agent")
+  id         Int                      @id @default(autoincrement())
+  ipAddress  String?                  @map("ip_address") @db.Inet
+  remotePort String?                  @map("remote_port")
+  userAgent  String?                  @map("user_agent")
   origin     String?
-  status     AuthenticationStatus
-  userId     Int?                 @map("user_id")
-  user       User?                @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  status     AuthenticationStatusType
+  createdAt  DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
 
-  createdAt DateTime @default(now()) @map("created_at")
+  userId Int?  @map("user_id")
+  user   User? @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([userId, createdAt], name: "idx_auth_audit_user_date")
   @@map("authentication_audit")
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  publicId      String    @unique @default(uuid(7)) @map("public_id")
-  name          String
-  username      String    @unique
-  email         String    @unique
-  cpf           String    @unique
-  passwordHash  String    @map("password_hash")
-  loginAttempts Int       @default(0) @map("login_attempts")
-  lastLogin     DateTime? @map("last_login")
-  role          UserRole  @default(DEFAULT)
-
-  token          String?   @unique
-  tokenExpiresAt DateTime? @map("token_expires_at")
-
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
-  passwordChangedAt DateTime? @map("password_changed_at") @db.Timestamptz(3)
+  id                Int          @id @default(autoincrement())
+  publicId          String       @unique @default(uuid(7)) @map("public_id")
+  name              String
+  birthdate         DateTime     @db.Date
+  username          String       @unique
+  email             String       @unique
+  cpf               String       @unique
+  passwordHash      String       @map("password_hash")
+  loginAttempts     Int          @default(0) @map("login_attempts")
+  lastLogin         DateTime?    @map("last_login") @db.Timestamptz(3)
+  role              UserRoleType @default(DEFAULT)
+  token             String?      @unique
+  tokenExpiresAt    DateTime?    @map("token_expires_at") @db.Timestamptz(3)
+  passwordChangedAt DateTime?    @map("password_changed_at") @db.Timestamptz(3)
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   authenticationAudits AuthenticationAudit[] @relation()
 
@@ -54,7 +48,7 @@ model User {
   @@map("users")
 }
 
-enum AuthenticationStatus {
+enum AuthenticationStatusType {
   SUCCESS
   USER_NOT_EXISTS
   INCORRECT_PASSWORD
@@ -63,7 +57,7 @@ enum AuthenticationStatus {
   BLOCKED
 }
 
-enum UserRole {
+enum UserRoleType {
   ADMIN
   DEFAULT
 }
