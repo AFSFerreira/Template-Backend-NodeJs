@@ -1,0 +1,57 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(dependencies)"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    groups:
+      # Agrupa as dependências do Sentry:
+      sentry-dependencies:
+        patterns:
+          - "@sentry/*"
+          - "sentry-*"
+
+      # Agrupa as dependências do Prisma:
+      prisma-dependencies:
+        patterns:
+          - "prisma"
+          - "@prisma/*"
+          - "prettier-plugin-prisma"
+
+      # Agrupa as dependências do Fastify:
+      fastify-dependencies:
+        patterns:
+          - "fastify"
+          - "@fastify/*"
+          - "fastify-*"
+
+      # Agrupa as dependências do Commitlint:
+      commitlint:
+        patterns:
+          - "@commitlint/*"
+          - "commitlint"
+
+      # Agrupa todas as atualizações de versões non-breaking (Fallback):
+      all-minor-patches:
+        patterns:
+          - "*"
+
+        update-types:
+          - "minor"
+          - "patch"
+
+        exclude-patterns:
+          - "@sentry/*"
+          - "sentry-*"
+          - "prisma"
+          - "@prisma/*"
+          - "fastify"
+          - "@fastify/*"
+          - "fastify-*"
+          - "@commitlint/*"
+          - "commitlint"
+
