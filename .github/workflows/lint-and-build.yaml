@@ -9,8 +9,6 @@ on:
 
 env:
   NODE_VERSION: 22.x
-  # Necerrário para executar o linting:
-  DUMMY_DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
 
 # NOTE: Se você utiliza o pnpm no projeto, comente os steps
 # que utilizam npm e descomente os que utilizam pnpm:
